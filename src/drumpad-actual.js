@@ -1,6 +1,6 @@
 import './App.js';
 import './App.css';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 
 
 //Drumset component
@@ -53,11 +53,46 @@ let drumset = [{
 }]
 //state: mute
 const [mute,setMute] = useState(true)
+const [power,setPower] = useState(false)
 const clicked = 'background:gold;border: 3px solid #333; color:#333;'
 const unclicked = 'background:#333;border: 3px solid gold; color:#fff;'
 //keydown fucntion
+const handleKeyDown = (e) => {
+    let audio = document.querySelectorAll('.drum-pad')
+    let k = e.key.toUpperCase()
+    audio.forEach(el=>{
+        var id = el.children[0].id
+        var audio = el.children[0]
+        if(id === k) {
+            try{
+                audio.play()
+            } catch (err){
+                console.log(err)
+            }
+        }
+       
+    })
+}
+useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
 
-
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown)
+    }
+}, [])
+let c = 0;//counter
+var handlePower = (e) => {
+    var base = e.currentTarget;
+    c++
+        if(c%2!=0){
+            setMute(()=>false)
+            base.children[0].classList.add('knob-on')
+        }
+        else{
+            setMute(()=>true)
+            base.children[0].classList.remove('knob-on')
+        }
+}
 
     return ( 
     <>
@@ -67,10 +102,11 @@ const unclicked = 'background:#333;border: 3px solid gold; color:#fff;'
         <div className="controls-container">
 
 {/*Power Button Controls*/}
-        <div className="power-label label"></div>
-        <div className="power power-btn btn">
-            <div className="knob-off"></div>
-            </div>              
+        <div className="power-label label">Off</div>
+        <div className="power power-btn btn" onClick={handlePower}>
+            
+        <div className="knob-off"></div>
+        </div>              
 {/*display*/}
             <div id="display" className="display-off"></div>
             <div className="sound-control sound snd-ctrl snd ctrl"></div>
@@ -81,26 +117,14 @@ const unclicked = 'background:#333;border: 3px solid gold; color:#fff;'
        drumset.map((pad,i) => {
         return <div key={i} className="drum-pad" onClick={(e)=>{
             var audio = e.target.children[0]
-               setMute(()=>false)
-                var playingNow = audio.currentTime>0&&!audio.paused &&audio.ended && audio.readyState>audio.HAVE_CURRENT_DATA;
-                if(!playingNow){
-                    audio.setAttribute('src',pad.src)
-                    audio.setAttribute('id',pad.id)
-                    audio.play()
-                }
-                else{
-                    return null;
-                }
-                
-            
-
-
+            audio.play()
+              
                 e.target.style = clicked
                 setTimeout(()=>{
                     e.target.style=unclicked
                 },50)
         }} id={pad.text}>
-                    <audio muted={mute} className="clip"></audio>
+                    <audio muted={mute} src={pad.src} id={pad.id} className="clip"></audio>
                     {pad.id}
                </div>
        })

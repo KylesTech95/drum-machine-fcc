@@ -48,17 +48,18 @@ body{
   border: 2px solid #000;
 }
 .power>div{
+  position: absolute;
   background: orangered;
   height: 20px;
   width: 50%;
 }
 .knob-off{
-  position: absolute;
   top: 0;
   right: 0;
 }
 .knob-on{
   left: 0;
+  top:0;
 }
 #display{
   height: 60px;
