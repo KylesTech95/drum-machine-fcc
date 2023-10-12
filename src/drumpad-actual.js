@@ -52,10 +52,12 @@ let drumset = [{
     src: 'https://s3.amazonaws.com/freecodecamp/drums/Cev_H2.mp3'
 }]
 //state: mute
-const [mute,setMute] = useState(true)
-const [power,setPower] = useState(false)
-const clicked = 'background:gold;border: 3px solid #333; color:#333;'
-const unclicked = 'background:#333;border: 3px solid gold; color:#fff;'
+const [mute,setMute] = useState(false)
+//styles object to simulate that a keypad is clicked and unclicked
+const styles = {
+    clicked:'background:gold;border: 3px solid #333; color:#333;',
+    unclicked: 'background:#333;border: 3px solid gold; color:#fff;'
+}
 //keydown fucntion
 const handleKeyDown = (e) => {
     let audio = document.querySelectorAll('.drum-pad')
@@ -63,10 +65,16 @@ const handleKeyDown = (e) => {
     audio.forEach(el=>{
         var id = el.children[0].id
         var audio = el.children[0]
+        //promise
         if(id === k) {
             try{
                 audio.play()
-            } catch (err){
+                el.style = styles.clicked
+                setTimeout(()=>{
+                    el.style=styles.unclicked
+                },50)
+            }
+           catch (err){
                 console.log(err)
             }
         }
@@ -75,23 +83,27 @@ const handleKeyDown = (e) => {
 }
 useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)
-
     return () => {
         window.removeEventListener('keydown', handleKeyDown)
     }
-}, [])
-let c = 0;//counter
+})
+// let c=0;//counter
 var handlePower = (e) => {
-    var base = e.currentTarget;
-    c++
-        if(c%2!=0){
-            setMute(()=>false)
-            base.children[0].classList.add('knob-on')
-        }
-        else{
-            setMute(()=>true)
-            base.children[0].classList.remove('knob-on')
-        }
+    //We set the state to determine weather the "mute" functionality is true of false
+    var base = e.currentTarget;//Current target ensures that any other targets (i.e. children) will interfere with the click.
+    var display = e.currentTarget.nextSibling;//grab the current target's next sibling and assign this a varibale (display)
+    var label = e.currentTarget.previousSibling
+    // c++//start the count
+    let togBtn = base.children[0]
+}
+const handleClick = (e)=>{
+    var audio = e.target.children[0]
+    audio.play()
+    
+        e.target.style = styles.clicked
+        setTimeout(()=>{
+            e.target.style = styles.unclicked
+        },50)
 }
 
     return ( 
@@ -102,28 +114,20 @@ var handlePower = (e) => {
         <div className="controls-container">
 
 {/*Power Button Controls*/}
-        <div className="power-label label">Off</div>
+        <div className="power-label label">On</div>
         <div className="power power-btn btn" onClick={handlePower}>
             
-        <div className="knob-off"></div>
+        <div className="knob-off knob-on"></div>{/*Both on & off classes are programmed in order to access it's active value.*/}
         </div>              
 {/*display*/}
-            <div id="display" className="display-off"></div>
+            <div id="display" className="display-on"></div>
             <div className="sound-control sound snd-ctrl snd ctrl"></div>
         </div>
 {/*key pad*/}
     <div className="btns-container">
        {
        drumset.map((pad,i) => {
-        return <div key={i} className="drum-pad" onClick={(e)=>{
-            var audio = e.target.children[0]
-            audio.play()
-              
-                e.target.style = clicked
-                setTimeout(()=>{
-                    e.target.style=unclicked
-                },50)
-        }} id={pad.text}>
+        return <div key={i} className="drum-pad" onClick={handleClick} id={pad.text}>
                     <audio muted={mute} src={pad.src} id={pad.id} className="clip"></audio>
                     {pad.id}
                </div>
