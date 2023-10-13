@@ -142,15 +142,14 @@ useEffect(() => {
     return ( 
     <>
 {/*Container*/}
-<div id="drum-machine" className="drum-container">
+<div id="drum-machine" className="drum-cReceiving objects:  40% (142524/356310), 127.62 MiB | 3.26 MiBontainer">
 {/*controls*/}
-        <div className="controls-container">
-
+    <div className="controls-container">
 {/*Power Button Controls*/}
         <Power item={handlePower}/>            
 {/*display*/}
-            <Display/>
-        </div>
+        <Display/>
+    </div>
 {/*key pad*/}
     <div className="btns-container">
        {
