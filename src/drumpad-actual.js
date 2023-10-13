@@ -1,6 +1,8 @@
 import './App.js';
 import './App.css';
 import { useState,useEffect } from 'react';
+import Display from './display.js'
+import Power from './power.js'
 
 
 //Drumset component
@@ -68,7 +70,15 @@ const handleKeyDown = (e) => {
         //promise
         if(id === k) {
             try{
-                audio.play()
+            var display = document.querySelector('#display')
+            drumset.forEach(pad=>{
+                if(audio.id===pad.id){
+                    audio.setAttribute('src',pad.src)
+                    audio.play()
+                    display.textContent = pad.text
+
+                }
+            })
                 el.style = styles.clicked
                 setTimeout(()=>{
                     el.style=styles.unclicked
@@ -81,30 +91,53 @@ const handleKeyDown = (e) => {
        
     })
 }
-useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    return () => {
-        window.removeEventListener('keydown', handleKeyDown)
-    }
-})
-// let c=0;//counter
-var handlePower = (e) => {
+const handlePower = (e) => {
     //We set the state to determine weather the "mute" functionality is true of false
     var base = e.currentTarget;//Current target ensures that any other targets (i.e. children) will interfere with the click.
     var display = e.currentTarget.nextSibling;//grab the current target's next sibling and assign this a varibale (display)
     var label = e.currentTarget.previousSibling
-    // c++//start the count
-    let togBtn = base.children[0]
+    var togBtn = base.children[0]
+
+    togBtn.classList.toggle('knob-off')
+    let arr = togBtn.classList.value.split` `;
+    setMute(cur=>!cur)
+    if(arr.length==1){
+        label.textContent='Off'
+        display.classList.remove('display-on')
+        display.classList.add('display-off')
+    }
+    else{
+        label.textContent='On'
+        display.classList.remove('display-off')
+        display.classList.add('display-on')
+        display.textContent = '';
+    }
+     
+
 }
 const handleClick = (e)=>{
     var audio = e.target.children[0]
-    audio.play()
+    var display = document.querySelector('#display')
+    drumset.forEach(pad=>{
+        if(audio.id===pad.id){
+            audio.setAttribute('src',pad.src)
+            audio.play()
+            display.textContent = pad.text
+
+        }
+    })
     
         e.target.style = styles.clicked
         setTimeout(()=>{
             e.target.style = styles.unclicked
         },50)
 }
+useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown)
+    }
+})
 
     return ( 
     <>
@@ -114,21 +147,16 @@ const handleClick = (e)=>{
         <div className="controls-container">
 
 {/*Power Button Controls*/}
-        <div className="power-label label">On</div>
-        <div className="power power-btn btn" onClick={handlePower}>
-            
-        <div className="knob-off knob-on"></div>{/*Both on & off classes are programmed in order to access it's active value.*/}
-        </div>              
+        <Power item={handlePower}/>            
 {/*display*/}
-            <div id="display" className="display-on"></div>
-            <div className="sound-control sound snd-ctrl snd ctrl"></div>
+            <Display/>
         </div>
 {/*key pad*/}
     <div className="btns-container">
        {
        drumset.map((pad,i) => {
         return <div key={i} className="drum-pad" onClick={handleClick} id={pad.text}>
-                    <audio muted={mute} src={pad.src} id={pad.id} className="clip"></audio>
+                    <audio muted={mute} id={pad.id} className="clip"></audio>
                     {pad.id}
                </div>
        })
